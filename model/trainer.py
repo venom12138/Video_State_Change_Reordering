@@ -101,7 +101,7 @@ def pairwise_acc(story, gt_order):
                 correct += 1
     return correct/total
 
-def validate(model, val_loader):
+def validate(model, val_loader, config):
     all_scores = []
     all_gt = []
     open_word_acc = {'svsn':{'scores':[], 'gt':[]}, 
@@ -116,7 +116,11 @@ def validate(model, val_loader):
             
             frames = data['rgb'].cuda()
             gt_order = data['gt_order'].cuda()
-            img_features = model.encode(frames) # [B, num_frames, 2048/1024]
+            if config['repr_type'] == 'SlowFast':
+                img_features = model.encode([data['slow_images'].cuda(), frames]).squeeze() # [B, num_frames, 2048/1024]
+            elif config['repr_type'] == 'VideoMae':
+                img_features = model.encode(frames) # [B, num_frames, 2048/1024]
+        
             scores = torch.zeros(img_features.shape[0], img_features.shape[1], img_features.shape[1]).cuda() # [B, num_frames, num_frames]
             # scores[b, i,j]代表第b个batch i>j的概率
             # scores = torch.zeros((img_features.shape[0], img_features.shape[1])).cuda() # [B, num_frames],代表了每一帧的得分
@@ -245,9 +249,9 @@ class Trainer:
             if (it) % self.log_text_interval == 0 and it != 0:
                 train_metrics = self.train_integrator.finalize()
                 if self.logger is not None:
-                    # self.model.eval()
-                    eval_metrics = validate(self.model.module, val_loader)
-                    # self.model.train()
+                    self.model.eval()
+                    eval_metrics = validate(self.model.module, val_loader, self.config)
+                    self.model.train()
                     self.logger.write(prefix='reorder', train_metrics=train_metrics, eval_metrics=eval_metrics,**{'lr':self.scheduler.get_last_lr()[0],
                                     'time':(time.time()-self.last_time)/self.log_text_interval})
                     all_dicts = {**train_metrics, **{'lr':self.scheduler.get_last_lr()[0],

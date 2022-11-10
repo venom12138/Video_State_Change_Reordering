@@ -144,8 +144,7 @@ val_dataset = EPICtestDataset(data_root=args.EPIC_path, yaml_root=args.yaml_path
                             num_frames=5, repr_type=args.repr_type)
 torch.autograd.set_grad_enabled(False)
 
-val_loader = DataLoader(dataset=val_dataset, batch_size=7, shuffle=False, num_workers=4, pin_memory=True)
-
+val_loader = DataLoader(dataset=val_dataset, batch_size=2, shuffle=False, num_workers=8, pin_memory=True)
 
 model = FrameReorderNet(config).cuda().eval()
 # load weights
@@ -171,7 +170,11 @@ with torch.cuda.amp.autocast(enabled=not args.benchmark):
             
             frames = data['rgb'].cuda()
             gt_order = data['gt_order'].cuda()
-            img_features = model.encode(frames) # [B, num_frames, 2048/1024]
+            if config['repr_type'] == 'SlowFast':
+                img_features = model.encode([data['slow_images'].cuda(), frames]).squeeze() # [B, num_frames, 2048/1024]
+            elif config['repr_type'] == 'VideoMae':
+                img_features = model.encode(frames) # [B, num_frames, 2048/1024]
+            
             scores = torch.zeros(img_features.shape[0], img_features.shape[1], img_features.shape[1]).cuda() # [B, num_frames, num_frames]
             # scores[b, i,j]代表第b个batch i>j的概率
             # scores = torch.zeros((img_features.shape[0], img_features.shape[1])).cuda() # [B, num_frames],代表了每一帧的得分

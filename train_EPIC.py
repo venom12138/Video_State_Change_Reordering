@@ -156,7 +156,7 @@ train_sampler, train_loader = construct_loader(train_dataset)
 val_dataset = EPICtestDataset(data_root='./val_data', yaml_root='./val_data/EPIC100_state_positive_val.yaml', valset_yaml_root='./val_data/reordering_val.yaml', 
                         num_frames=5, repr_type=config['repr_type'])
 
-val_loader = DataLoader(dataset=val_dataset, batch_size=7, shuffle=False, num_workers=4, pin_memory=True)
+val_loader = DataLoader(dataset=val_dataset, batch_size=2, shuffle=False, num_workers=4, pin_memory=True)
 
 # Load pertrained model if needed
 total_iter = 0
