@@ -212,10 +212,10 @@ class Trainer:
         frames = data['rgb'].cuda() # [B, num_frames, 3, H, W]
         gt_order = data['gt_order'].cuda() # [B, num_frames]
         if self.config['repr_type'] == 'SlowFast':
-            img_features = self.model.module.encode([data['slow_images'].cuda(), frames]) # [B, num_frames, 2048/1024]
+            img_features = self.model.module.encode([data['slow_images'].cuda(), frames]).squeeze() # [B, num_frames, 2048/1024]
         elif self.config['repr_type'] == 'VideoMae':
             img_features = self.model.module.encode(frames) # [B, num_frames, 2048/1024]
-        print(f"img_features: {img_features.shape}")
+        
         all_logits = []
         all_target = []
         for idx1 in range(self.config['num_frames']):
@@ -237,17 +237,17 @@ class Trainer:
         losses = self.loss_computer.compute(all_logits, all_target)
         
         # recording
-        if self.logger is not None:
+        if self._do_log:
             self.integrator.add_dict(losses)
         
         if self._is_train:
+            
             if (it) % self.log_text_interval == 0 and it != 0:
                 train_metrics = self.train_integrator.finalize()
-                
                 if self.logger is not None:
-                    self.model.eval()
+                    # self.model.eval()
                     eval_metrics = validate(self.model.module, val_loader)
-                    self.model.train()
+                    # self.model.train()
                     self.logger.write(prefix='reorder', train_metrics=train_metrics, eval_metrics=eval_metrics,**{'lr':self.scheduler.get_last_lr()[0],
                                     'time':(time.time()-self.last_time)/self.log_text_interval})
                     all_dicts = {**train_metrics, **{'lr':self.scheduler.get_last_lr()[0],
@@ -272,10 +272,12 @@ class Trainer:
         self.optimizer.zero_grad(set_to_none=True)
         if self.config['amp']:
             self.scaler.scale(losses['total_loss']).backward()
+            
             self.scaler.step(self.optimizer)
             self.scaler.update()
         else:
             losses['total_loss'].backward() 
+            
             self.optimizer.step()
         self.scheduler.step()
         

@@ -134,7 +134,7 @@ class VideoMae(nn.Module):
         
         outputs = self.model(x)
         x = outputs.last_hidden_state # B, 8*14*14, 768
-        print(f"x:{x.shape}")
+        
         x = self.attn_flat(x)
         
         return x # B, 768

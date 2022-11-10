@@ -8,9 +8,9 @@ import pickle
 from collections import OrderedDict
 import torch
 
-import slowfast.utils.distributed as du
-import slowfast.utils.logging as logging
-from slowfast.utils.c2_model_loading import get_name_convert_func
+import model.slowfast.utils.distributed as du
+import model.slowfast.utils.logging as logging
+from model.slowfast.utils.c2_model_loading import get_name_convert_func
 
 logger = logging.get_logger(__name__)
 

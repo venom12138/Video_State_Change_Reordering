@@ -60,17 +60,15 @@ class Integrator:
             self.add_tensor(k, v)
 
         for k, v in self.values.items():
-
             if k[:4] == 'hide':
                 continue
-
             avg = v / self.counts[k]
-
             if self.distributed:
                 # Inplace operation
                 avg = torch.tensor(avg).cuda()
+                
                 torch.distributed.reduce(avg, dst=0)
-
+                
                 if self.local_rank == 0:
                     avg = (avg/self.world_size).cpu().item()
                     output_dict.update({k: avg})
@@ -79,5 +77,6 @@ class Integrator:
                 # Simple does it
                 # self.logger.log_metrics(prefix, k, avg, it, f)
                 output_dict.update({k: avg})
+        
         return output_dict
 

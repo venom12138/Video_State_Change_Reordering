@@ -11,8 +11,8 @@ from fvcore.nn.flop_count import flop_count
 from matplotlib import pyplot as plt
 from torch import nn
 
-import slowfast.utils.logging as logging
-from slowfast.datasets.utils import pack_pathway_output
+import model.slowfast.utils.logging as logging
+from model.slowfast.datasets.utils import pack_pathway_output
 
 logger = logging.get_logger(__name__)
 

@@ -9,7 +9,7 @@ import pickle
 import torch
 import torch.distributed as dist
 
-from slowfast.utils.env import setup_dist_environment
+from model.slowfast.utils.env import setup_dist_environment
 
 setup_dist_environment()
 

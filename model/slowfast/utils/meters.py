@@ -10,11 +10,11 @@ from collections import defaultdict, deque
 import torch
 from fvcore.common.timer import Timer
 
-import slowfast.datasets.ava_helper as ava_helper
-import slowfast.utils.logging as logging
-import slowfast.utils.metrics as metrics
-import slowfast.utils.misc as misc
-from slowfast.utils.ava_eval_helper import (
+# import slowfast.datasets.ava_helper as ava_helper
+import model.slowfast.utils.logging as logging
+import model.slowfast.utils.metrics as metrics
+import model.slowfast.utils.misc as misc
+from model.slowfast.utils.ava_eval_helper import (
     evaluate_ava,
     read_csv,
     read_exclusions,

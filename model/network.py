@@ -93,7 +93,7 @@ class FrameReorderNet(nn.Module):
             x = [x[0].permute(0, 2, 1, 3, 4), x[1].permute(0, 2, 1, 3, 4)]
             x = self.Encoder(x)
         x = x.view(B, 5, *x.shape[1:])
-        print(f"x output:{x.shape}")
+        
         return x.to(self.Classifier.classifier[0].weight.dtype)  # [B, numframes, 768]
     
     # x: [B,1024*2/2048*2] 
