@@ -120,7 +120,7 @@ def validate(model, val_loader, config):
                 img_features = model.encode([data['slow_images'].cuda(), frames]).squeeze() # [B, num_frames, 2048/1024]
             elif config['repr_type'] == 'VideoMae':
                 img_features = model.encode(frames) # [B, num_frames, 2048/1024]
-        
+            
             scores = torch.zeros(img_features.shape[0], img_features.shape[1], img_features.shape[1]).cuda() # [B, num_frames, num_frames]
             # scores[b, i,j]代表第b个batch i>j的概率
             # scores = torch.zeros((img_features.shape[0], img_features.shape[1])).cuda() # [B, num_frames],代表了每一帧的得分

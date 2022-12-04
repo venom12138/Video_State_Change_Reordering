@@ -121,7 +121,6 @@ class EPICtestDataset(Dataset):
             'gt_order': gt_order, # [num_frames]
             'text':video_value['narration'],
             'open_word_type':self.open_word_info[self.vids[idx]],
-            'info': info
         }
 
         return data

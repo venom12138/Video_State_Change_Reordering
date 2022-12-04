@@ -118,11 +118,11 @@ parser.add_argument('--valset_yaml_path', default='./val_data/reordering_val.yam
 parser.add_argument('--output', default=None)
 parser.add_argument('--num_frames', default=5, type=int)
 parser.add_argument('--benchmark', action='store_true', help='enable to disable amp for FPS benchmarking')
-parser.add_argument('--repr_type', type=str, choices=['Clip', 'ImageNet', 'Segmentation', 'Action'])
+parser.add_argument('--repr_type', type=str, choices=['SlowFast', 'VideoMae'])
 parser.add_argument('--freeze', default=0, type=int, choices=[0,1])
 parser.add_argument('--use_position_embedding', default=1, type=int, choices=[0,1])
 parser.add_argument('--openword_test', default=0, type=int, choices=[0,1])
-    
+parser.add_argument('--config_file', default='./model/slowfast/SLOWFAST_8x8_R50.yaml', type=str)
 args = parser.parse_args()
 
 config = vars(args)
@@ -144,7 +144,7 @@ val_dataset = EPICtestDataset(data_root=args.EPIC_path, yaml_root=args.yaml_path
                             num_frames=5, repr_type=args.repr_type)
 torch.autograd.set_grad_enabled(False)
 
-val_loader = DataLoader(dataset=val_dataset, batch_size=2, shuffle=False, num_workers=8, pin_memory=True)
+val_loader = DataLoader(dataset=val_dataset, batch_size=4, shuffle=False, num_workers=8, pin_memory=True)
 
 model = FrameReorderNet(config).cuda().eval()
 # load weights
